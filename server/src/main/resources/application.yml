@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+
+spring:
+  datasource:
+    url: jdbc:mysql://34.64.86.164:3306/bankdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: Tdk2507280503
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

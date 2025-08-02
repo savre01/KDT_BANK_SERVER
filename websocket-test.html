@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket 채팅 테스트</title>
+</head>
+<body>
+  <h2>🔌 WebSocket 채팅 테스트</h2>
+
+  <label>JWT Token: </label><br>
+  <input id="token" type="text" size="80" placeholder="Bearer 제외한 순수 JWT 입력"><br><br>
+
+  <label>Chat Index: </label><br>
+  <input id="chatIndex" type="number" value="1"><br><br>
+
+  <label>User Index: </label><br>
+  <input id="userIndex" type="number" value="1"><br><br>
+
+  <label>Message Content: </label><br>
+  <input id="content" type="text" size="50"><br><br>
+
+  <button onclick="connect()">Connect</button>
+  <button onclick="sendMessage()">Send</button>
+
+  <h3>📥 수신 메시지:</h3>
+  <pre id="messages" style="background:#f0f0f0; padding:10px; height:300px; overflow:auto;"></pre>
+
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+  <script>
+    let stompClient = null;
+
+    function connect() {
+      const token = document.getElementById('token').value;
+      const socket = new SockJS("http://localhost:8080/ws-chat");
+      stompClient = Stomp.over(socket);
+      stompClient.connect(
+        { Authorization: "Bearer " + token },
+        function (frame) {
+          log("✅ 연결 성공: " + frame);
+          stompClient.subscribe("/topic/chat", function (message) {
+            log("📩 수신됨: " + message.body);
+          });
+        },
+        function (error) {
+          log("❌ 연결 실패: " + error);
+        }
+      );
+    }
+
+    function sendMessage() {
+      const chatIndex = document.getElementById('chatIndex').value;
+      const userIndex = document.getElementById('userIndex').value;
+      const content = document.getElementById('content').value;
+
+      stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({
+        chatIndex: Number(chatIndex),
+        userIndex: Number(userIndex),
+        content: content,
+        messageType: "TEXT"
+      }));
+      log("🚀 전송됨: " + content);
+    }
+
+    function log(message) {
+      const messagesEl = document.getElementById('messages');
+      messagesEl.textContent += message + "\n";
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  </script>
+</body>
+</html>
