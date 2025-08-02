@@ -2,6 +2,8 @@ package com.bank.server.controller;
 import com.bank.server.dto.user.UserResponse;
 import com.bank.server.dto.user.UserSummaryResponse;
 import com.bank.server.dto.user.AdminUserResponse;
+import com.bank.server.dto.user.UpdateUserRequest;
+
 import org.springframework.security.core.Authentication;
 
 import com.bank.server.model.User;
@@ -41,7 +43,16 @@ public class UserController {
             return ResponseEntity.ok(new UserResponse(user));
         }
     }
-
+    //사원 수정
+    @PutMapping("/{userIndex}")
+    public User updateUser(@PathVariable Long userIndex,
+                        @RequestBody UpdateUserRequest request) {
+        return userService.updateUser(userIndex,
+                                    request.getPhoneNumber(),
+                                    request.getPosition(),
+                                    request.getDepartment(),
+                                    request.isAdmin());
+    }
     //사원 삭제
     @DeleteMapping("/{userIndex}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userIndex) {

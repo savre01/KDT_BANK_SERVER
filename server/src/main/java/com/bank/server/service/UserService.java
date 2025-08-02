@@ -7,6 +7,8 @@ import com.bank.server.repository.UserRepository;
 import com.bank.server.repository.FriendRepository;
 import com.bank.server.repository.chat.ChatMemberRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,22 @@ public class UserService {
             .orElseThrow(() -> new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
         return new AdminUserResponse(user);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public User updateUser(Long userIndex, String phoneNumber, String position, String department, boolean isAdmin) {
+        // 사용자가 존재하는지 확인
+        User user = userRepository.findById(userIndex)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 수정할 내용 설정
+        user.setUserPhone(phoneNumber);
+        user.setPosition(position);
+        user.setDepartment(department);
+        user.setAdmin(isAdmin);
+
+        return userRepository.save(user);
     }
     @Transactional
     public void deleteUser(Long userIndex) {
