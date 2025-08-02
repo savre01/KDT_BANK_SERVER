@@ -9,6 +9,8 @@ import com.bank.server.repository.UserRepository;
 import com.bank.server.repository.FriendRepository;
 import com.bank.server.repository.chat.ChatMemberRepository;
 import com.bank.server.repository.chat.ChatRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -77,4 +79,17 @@ public class ChatMemberService {
             })
             .collect(Collectors.toList());
     }
+     @Transactional
+     public void removeUserFromChat(Long chatIndex, Long userIndex) {
+        // chatIndex로 채팅방을 찾음
+        Chat chat = chatRepository.findById(chatIndex)
+                .orElseThrow(() -> new RuntimeException("Chat not found"));
+
+        // userIndex로 사용자를 찾음
+        User user = userRepository.findById(userIndex)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 채팅방에서 해당 사용자를 삭제
+        chatMemberRepository.deleteByUserAndChat(user, chat);
+     }
 }

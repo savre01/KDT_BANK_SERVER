@@ -11,4 +11,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Optional<Friend> findByUserAndFriend(User user, User friend);
     boolean existsByUserAndFriend(User user, User friend);
     List<Friend> findByUser(User user);
+    void deleteByUser(User user);
+    void deleteByFriend(User friend);
 }

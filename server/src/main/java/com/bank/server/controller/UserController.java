@@ -41,4 +41,11 @@ public class UserController {
             return ResponseEntity.ok(new UserResponse(user));
         }
     }
+
+    //사원 삭제
+    @DeleteMapping("/{userIndex}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userIndex) {
+        userService.deleteUser(userIndex);
+        return ResponseEntity.noContent().build(); 
+    }
 }
