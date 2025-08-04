@@ -80,16 +80,21 @@ public class ChatMemberService {
             .collect(Collectors.toList());
     }
      @Transactional
-     public void removeUserFromChat(Long chatIndex, Long userIndex) {
-        // chatIndex로 채팅방을 찾음
+     public void deleteMember(Long chatIndex, Long userIndex) {
+        // 1. 채팅방과 사용자 조회
         Chat chat = chatRepository.findById(chatIndex)
                 .orElseThrow(() -> new RuntimeException("Chat not found"));
 
-        // userIndex로 사용자를 찾음
         User user = userRepository.findById(userIndex)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 채팅방에서 해당 사용자를 삭제
+        // 2. 채팅방에서 사용자 제거
         chatMemberRepository.deleteByUserAndChat(user, chat);
-     }
+
+        // 3. 남은 멤버 수 확인
+        int remaining = chatMemberRepository.countByChat_ChatIndex(chatIndex);
+        if (remaining == 0) {
+                chatRepository.delete(chat);
+        }
+    }
 }

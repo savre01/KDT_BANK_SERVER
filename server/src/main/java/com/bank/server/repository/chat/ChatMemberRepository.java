@@ -14,4 +14,5 @@ public interface ChatMemberRepository extends JpaRepository<ChatMember, ChatMemb
     boolean existsByChatAndUser(Chat chat, User user);
     void deleteByUser(User user);
     void deleteByUserAndChat(User user, Chat chat);
+    int countByChat_ChatIndex(Long chatIndex);
 }

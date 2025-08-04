@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,18 +75,13 @@ public class UserService {
         return userRepository.save(user);
     }
     @Transactional
-    public void deleteUser(Long userIndex) {
-        User user = userRepository.findById(userIndex)
-            .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
-
-        // 1. 친구 관계 삭제
-        friendRepository.deleteByUser(user);
-        friendRepository.deleteByFriend(user);
-
-        // 2. 채팅방에서 사용자 삭제
-        chatMemberRepository.deleteByUser(user);
-
-        // 3. 사용자 삭제
-        userRepository.delete(user);
+    public Optional<User> deleteUser(Long userIndex) {
+        return userRepository.findById(userIndex).map(user -> {
+            friendRepository.deleteByUser(user);
+            friendRepository.deleteByFriend(user);
+            chatMemberRepository.deleteByUser(user);
+            userRepository.delete(user);
+            return user;
+        });
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,20 +47,19 @@ public class FriendService {
                 .collect(Collectors.toList());
     }
 
-     public void deleteFriend(Long userIndex, Long friendIndex) {
+    public Optional<Friend> deleteFriend(Long userIndex, Long friendIndex) {
         User user = userRepository.findById(userIndex)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
         User friend = userRepository.findById(friendIndex)
                 .orElseThrow(() -> new UsernameNotFoundException("친구 없음"));
 
-        // 친구 관계가 존재하는지 확인
         if (!friendRepository.existsByUserAndFriend(user, friend)) {
-            throw new IllegalArgumentException("친구 관계가 존재하지 않습니다");
+                return Optional.empty(); // 친구 관계 없음
         }
-        // 친구 관계 삭제
-        Friend friendRelationship = friendRepository.findByUserAndFriend(user, friend)
-                .orElseThrow(() -> new IllegalArgumentException("친구 관계를 찾을 수 없습니다"));
-        
-        friendRepository.delete(friendRelationship);
-    }
+
+        return friendRepository.findByUserAndFriend(user, friend).map(friendship -> {
+                friendRepository.delete(friendship);
+                return friendship;
+                });
+        }
 }

@@ -39,9 +39,10 @@ public class ChatController {
 
     // 채팅방 삭제
     @DeleteMapping("/{chatIndex}")
-    public ResponseEntity<Void> deleteChat(@PathVariable Long chatIndex) {
-        chatService.deleteChat(chatIndex);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteChat(@PathVariable Long chatIndex) {
+        return chatService.deleteChat(chatIndex)
+                .map(chat -> ResponseEntity.ok("삭제 완료"))
+                .orElse(ResponseEntity.notFound().build());
     }
     //채팅방 상세 조회
     @GetMapping("/{chatIndex}")

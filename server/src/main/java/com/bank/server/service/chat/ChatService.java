@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,11 +91,12 @@ public class ChatService {
         }
 
     // 채팅방 삭제
-    public void deleteChat(Long chatIndex) {
-        Chat chat = chatRepository.findById(chatIndex)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다"));
-        chatRepository.delete(chat);
-    }
+    public Optional<Chat> deleteChat(Long chatIndex) {
+        return chatRepository.findById(chatIndex).map(chat -> {
+                chatRepository.delete(chat);
+                return chat;
+        });
+        }
 
     // 전체 채팅방 리스트 DTO 반환
     public List<ChatResponse> getAllChatResponses() {

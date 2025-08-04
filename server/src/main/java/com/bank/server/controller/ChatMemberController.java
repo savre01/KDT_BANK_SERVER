@@ -2,7 +2,6 @@ package com.bank.server.controller;
 
 import com.bank.server.dto.chat.ChatMemberResponse;
 import com.bank.server.dto.chat.ChatMemberRequest;
-import com.bank.server.model.User;
 import com.bank.server.model.chat.ChatMember;
 import com.bank.server.service.UserService;
 import com.bank.server.service.chat.ChatMemberService;
@@ -35,8 +34,8 @@ public class ChatMemberController {
     }
 
     @DeleteMapping("/{chatIndex}/{userIndex}")
-    public String removeUserFromChat(@PathVariable Long chatIndex, @PathVariable Long userIndex) {
-        chatMemberService.removeUserFromChat(chatIndex, userIndex);  // 서비스에서 사용자 삭제 처리
+    public String deleteMember(@PathVariable Long chatIndex, @PathVariable Long userIndex) {
+        chatMemberService.deleteMember(chatIndex, userIndex);  // 서비스에서 사용자 삭제 처리
         return "User removed from chat";
     }
 }

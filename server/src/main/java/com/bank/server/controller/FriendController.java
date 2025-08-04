@@ -1,10 +1,12 @@
 package com.bank.server.controller;
 
 import com.bank.server.dto.user.UserSummaryResponse;
+import com.bank.server.model.User;
 import com.bank.server.service.FriendService;
 import com.bank.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,13 +40,14 @@ public class FriendController {
     }
     //친구 삭제
     @DeleteMapping("/{friendIndex}")
-    public ResponseEntity<Void> removeFriend(@PathVariable Long friendIndex, Authentication auth) {
-        String userId = auth.getName();
-        Long userIndex = userService.getUserByUserId(userId).getUserIndex();
+    @PreAuthorize("hasRole('ADMIN')") // 필요 시
+    public ResponseEntity<String> deleteFriend(@PathVariable Long friendIndex, Authentication authentication) {
+        // 현재 로그인한 사용자 ID 추출
+        String userId = authentication.getName();
+        User user = userService.getUserByUserId(userId);
 
-        // 친구 삭제 서비스 호출
-        friendService.deleteFriend(userIndex, friendIndex);
-        
-        return ResponseEntity.noContent().build();  // 204 No Content 응답
+        return friendService.deleteFriend(user.getUserIndex(), friendIndex)
+                .map(f -> ResponseEntity.ok("삭제 완료"))
+                .orElse(ResponseEntity.notFound().build());
     }
 }

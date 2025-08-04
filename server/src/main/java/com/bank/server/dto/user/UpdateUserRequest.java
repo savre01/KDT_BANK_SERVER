@@ -9,5 +9,5 @@ public class UpdateUserRequest {
     private String phoneNumber;
     private String position;
     private String department;
-    private boolean isAdmin;
+    private boolean admin;
 }

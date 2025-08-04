@@ -4,6 +4,7 @@ import com.bank.server.dto.user.UserSummaryResponse;
 import com.bank.server.dto.user.AdminUserResponse;
 import com.bank.server.dto.user.UpdateUserRequest;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 
 import com.bank.server.model.User;
@@ -55,8 +56,10 @@ public class UserController {
     }
     //사원 삭제
     @DeleteMapping("/{userIndex}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userIndex) {
-        userService.deleteUser(userIndex);
-        return ResponseEntity.noContent().build(); 
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userIndex) {
+        return userService.deleteUser(userIndex)
+                .map(u -> ResponseEntity.ok("삭제 완료"))
+                .orElse(ResponseEntity.notFound().build());
     }
 }
