@@ -1,4 +1,4 @@
-package com.bank.server.controller;
+package com.bank.server.controller.chat;
 
 import com.bank.server.dto.chat.ChatMemberResponse;
 import com.bank.server.dto.chat.ChatMemberRequest;
@@ -34,8 +34,10 @@ public class ChatMemberController {
     }
 
     @DeleteMapping("/{chatIndex}/{userIndex}")
-    public String deleteMember(@PathVariable Long chatIndex, @PathVariable Long userIndex) {
-        chatMemberService.deleteMember(chatIndex, userIndex);  // 서비스에서 사용자 삭제 처리
-        return "User removed from chat";
+    public ResponseEntity<String> deleteMember(@PathVariable Long chatIndex, @PathVariable Long userIndex) {
+        boolean deleted = chatMemberService.deleteMember(chatIndex, userIndex);
+        return deleted
+            ? ResponseEntity.ok("User removed from chat")
+            : ResponseEntity.notFound().build();
     }
 }

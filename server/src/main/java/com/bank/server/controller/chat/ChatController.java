@@ -1,6 +1,5 @@
-package com.bank.server.controller;
+package com.bank.server.controller.chat;
 
-import com.bank.server.dto.chat.ChatDetailResponse;
 import com.bank.server.dto.chat.ChatRequest;
 import com.bank.server.dto.chat.ChatResponse;
 import com.bank.server.dto.chat.ChatSummaryResponse;
@@ -46,8 +45,10 @@ public class ChatController {
     }
     //채팅방 상세 조회
     @GetMapping("/{chatIndex}")
-    public ResponseEntity<ChatDetailResponse> getChatDetail(@PathVariable Long chatIndex) {
-        return ResponseEntity.ok(chatService.getChatDetail(chatIndex));
+    public ResponseEntity<?> getChatDetail(@PathVariable Long chatIndex) {
+        return chatService.getChatDetailOptional(chatIndex)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
     //내 채팅방 확인
     @GetMapping("/me")

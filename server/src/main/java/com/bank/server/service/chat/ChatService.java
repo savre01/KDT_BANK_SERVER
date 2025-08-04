@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChatService {
-
+        
     private final ChatRepository chatRepository;
     private final ChatMemberRepository chatMemberRepository;
     private final UserRepository userRepository;
@@ -60,6 +60,15 @@ public class ChatService {
         chat.setChatCreated(new Date());
         Chat savedChat = chatRepository.save(chat);
 
+        // 본인도 채팅방에 추가
+        if (!memberIndexes.contains(requesterIndex)) {
+                ChatMember creator = new ChatMember();
+                creator.setChat(savedChat);
+                creator.setUser(requester);
+                creator.setJoined(new Date());
+                chatMemberRepository.save(creator);
+        }
+
         // 멤버들 추가
         for (Long memberIndex : memberIndexes) {
                 User user = userRepository.findById(memberIndex)
@@ -76,15 +85,6 @@ public class ChatService {
                 member.setUser(user);
                 member.setJoined(new Date());
                 chatMemberRepository.save(member);
-        }
-
-        // 본인도 채팅방에 추가
-        if (!memberIndexes.contains(requesterIndex)) {
-                ChatMember creator = new ChatMember();
-                creator.setChat(savedChat);
-                creator.setUser(requester);
-                creator.setJoined(new Date());
-                chatMemberRepository.save(creator);
         }
 
         return savedChat;
@@ -123,24 +123,24 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
     //채팅방 상세 조회
-    public ChatDetailResponse getChatDetail(Long chatIndex) {
-        Chat chat = chatRepository.findById(chatIndex)
-                .orElseThrow(() -> new IllegalArgumentException("해당 채팅방이 존재하지 않습니다."));
+    public Optional<ChatDetailResponse> getChatDetailOptional(Long chatIndex) {
+        return chatRepository.findById(chatIndex)
+                .map(chat -> {
+                List<ChatMemberResponse> members = chatMemberRepository.findByChat(chat).stream()
+                        .map(member -> new ChatMemberResponse(
+                                member.getUser().getUserIndex(),
+                                member.getUser().getUserId(),
+                                member.getUser().getUserName()
+                        ))
+                        .collect(Collectors.toList());
 
-        List<ChatMemberResponse> members = chatMemberRepository.findByChat(chat).stream()
-                .map(member -> new ChatMemberResponse(
-                        member.getUser().getUserIndex(),
-                        member.getUser().getUserId(),
-                        member.getUser().getUserName()
-                ))
-                .collect(Collectors.toList());
-
-        return new ChatDetailResponse(
-                chat.getChatIndex(),
-                chat.getChatName(),
-                members
-        );
-    }
+                return new ChatDetailResponse(
+                        chat.getChatIndex(),
+                        chat.getChatName(),
+                        members
+                );
+                });
+        }
     //내 채팅방 조회
     public List<ChatSummaryResponse> getChatsByUser(String userId) {
         User user = userRepository.findByUserId(userId)

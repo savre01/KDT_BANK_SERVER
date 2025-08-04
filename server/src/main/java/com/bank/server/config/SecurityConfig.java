@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // ✅ 최신 방식
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
@@ -40,10 +40,17 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/users/me").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/users").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .requestMatchers("/api/chat/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/friends").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/friends/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/customers").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/customers/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/products").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/accounts").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/accounts/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/ws-chat/**").permitAll()
                 .anyRequest().authenticated()
             )

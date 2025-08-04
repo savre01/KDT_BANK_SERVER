@@ -40,7 +40,7 @@ public class ChatMemberService {
                 User user = userRepository.findById(userIndex)
                         .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
-                // ✅ 친구 여부 확인
+                // 친구 여부 확인
                 if (!friendRepository.existsByUserAndFriend(requester, user)) {
                 throw new IllegalArgumentException("친구만 채팅방에 추가할 수 있습니다: " + user.getUserName());
                 }
@@ -80,21 +80,24 @@ public class ChatMemberService {
             .collect(Collectors.toList());
     }
      @Transactional
-     public void deleteMember(Long chatIndex, Long userIndex) {
-        // 1. 채팅방과 사용자 조회
+     public boolean deleteMember(Long chatIndex, Long userIndex) {
         Chat chat = chatRepository.findById(chatIndex)
-                .orElseThrow(() -> new RuntimeException("Chat not found"));
-
+                .orElse(null);
         User user = userRepository.findById(userIndex)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElse(null);
 
-        // 2. 채팅방에서 사용자 제거
+        if (chat == null || user == null) {
+                return false;
+        }
+
+        // 채팅방에서 사용자 제거
         chatMemberRepository.deleteByUserAndChat(user, chat);
 
-        // 3. 남은 멤버 수 확인
+        // 남은 멤버 수 확인 → 채팅방 제거 조건
         int remaining = chatMemberRepository.countByChat_ChatIndex(chatIndex);
         if (remaining == 0) {
                 chatRepository.delete(chat);
         }
-    }
+        return true;
+        }
 }

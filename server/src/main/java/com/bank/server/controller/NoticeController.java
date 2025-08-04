@@ -22,13 +22,15 @@ public class NoticeController {
 
     // 전체 조회 - 누구나
     @GetMapping
-    public List<NoticeSummaryResponse> getAll() {
-        return noticeService.getAllNotices().stream()
+    public ResponseEntity<List<NoticeSummaryResponse>> getAll() {
+        List<NoticeSummaryResponse> result = noticeService.getAllNotices().stream()
             .map(n -> new NoticeSummaryResponse(
                 n.getNoticeIndex(),
                 n.getNoticeTitle(),
                 n.getCreatedAt().toLocalDate()))
             .toList();
+
+        return ResponseEntity.ok(result);
     }
 
     // 단건 조회 - 누구나
@@ -60,7 +62,7 @@ public class NoticeController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         return noticeService.deleteNotice(id)
-                .map(n -> ResponseEntity.ok("삭제 완료")) // 200 OK + 메시지 포함
-                .orElse(ResponseEntity.notFound().build()); // 404 Not Found
+                .map(n -> ResponseEntity.ok("삭제 완료")) 
+                .orElse(ResponseEntity.notFound().build()); 
     }
 }

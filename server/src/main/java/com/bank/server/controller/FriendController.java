@@ -25,9 +25,9 @@ public class FriendController {
     public ResponseEntity<Void> addFriend(@RequestBody Map<String, Long> body, Authentication auth) {
         String userId = auth.getName();
         Long myIndex = userService.getUserByUserId(userId).getUserIndex();
-        Long friendIndex = body.get("friendIndex");
+        Long userIndex = body.get("userIndex");
 
-        friendService.addFriend(myIndex, friendIndex);
+        friendService.addFriend(myIndex, userIndex);
         return ResponseEntity.ok().build();
     }
     //내 친구 조회
