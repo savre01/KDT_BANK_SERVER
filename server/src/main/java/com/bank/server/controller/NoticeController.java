@@ -58,8 +58,9 @@ public class NoticeController {
     // 삭제 - 관리자만
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        noticeService.deleteNotice(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        return noticeService.deleteNotice(id)
+                .map(n -> ResponseEntity.ok("삭제 완료")) // 200 OK + 메시지 포함
+                .orElse(ResponseEntity.notFound().build()); // 404 Not Found
     }
 }

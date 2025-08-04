@@ -36,7 +36,10 @@ public class NoticeService {
         });
     }
 
-    public void deleteNotice(Long id) {
-        noticeRepository.deleteById(id);
+    public Optional<Notice> deleteNotice(Long id) {
+    return noticeRepository.findById(id).map(notice -> {
+        noticeRepository.delete(notice);
+        return notice;
+    });
     }
 }
