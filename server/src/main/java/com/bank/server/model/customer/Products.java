@@ -23,7 +23,4 @@ public class Products {
 
     @Column(nullable = false)
     private String productName;
-
-    @Column(columnDefinition = "TEXT")
-    private String productDescription;
 }

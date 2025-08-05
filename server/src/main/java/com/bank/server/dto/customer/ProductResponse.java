@@ -10,7 +10,6 @@ public class ProductResponse {
     private Double rate;
     private String productName;
     private Integer duration;
-    private String productDescription;
 
     public ProductResponse(Products p) {
         this.productsIndex = p.getProductsIndex();
@@ -18,6 +17,5 @@ public class ProductResponse {
         this.rate = p.getInterestRate();
         this.productName = p.getProductName();
         this.duration = p.getProductsDuration();
-        this.productDescription = p.getProductDescription();
     }
 }

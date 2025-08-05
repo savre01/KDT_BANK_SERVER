@@ -8,5 +8,4 @@ public class ProductRequest {
     private Double rate;
     private String productName;
     private Integer duration;
-    private String productDescription;
 }

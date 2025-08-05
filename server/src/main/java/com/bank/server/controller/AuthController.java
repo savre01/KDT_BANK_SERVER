@@ -1,4 +1,3 @@
-// controller/AuthController.java
 package com.bank.server.controller;
 import org.springframework.http.ResponseEntity;
 

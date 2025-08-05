@@ -28,6 +28,8 @@ public class Account {
     @Column(nullable = false, unique = true)
     private String accountNum;
 
+    private String accountPassword;
+
     @Column(precision = 15, scale = 2)
     private BigDecimal accountBalance;
 
@@ -37,5 +39,13 @@ public class Account {
 
     private Integer paymentDay; // 매달 납부일
 
-    private String accountStatus = "ACTIVE";
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus = AccountStatus.PENDING;
+
+    // 내부 enum으로 선언
+    public enum AccountStatus {
+        PENDING,
+        ACTIVE
+    }
 }

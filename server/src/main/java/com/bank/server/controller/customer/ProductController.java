@@ -26,6 +26,13 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/{productsIndex}")
+    public ResponseEntity<?> getProductById(@PathVariable Long productsIndex) {
+        return productService.getProductByIdOptional(productsIndex)
+                .map(ProductResponse::new)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @PostMapping("/type")
     public ResponseEntity<?> getProductsByType(@RequestBody ProductRequest request) {
@@ -46,7 +53,6 @@ public class ProductController {
         product.setInterestRate(request.getRate());
         product.setProductName(request.getProductName());
         product.setProductsDuration(request.getDuration());
-        product.setProductDescription(request.getProductDescription());
         return ResponseEntity.ok(new ProductResponse(productService.createProduct(product)));
     }
 }

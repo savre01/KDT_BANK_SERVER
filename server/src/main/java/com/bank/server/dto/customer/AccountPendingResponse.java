@@ -3,27 +3,19 @@ package com.bank.server.dto.customer;
 import com.bank.server.model.customer.Account;
 import lombok.Getter;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 @Getter
-public class AccountResponse {
+public class AccountPendingResponse {
     private Long accountIndex;
     private String accountNum;
-    private BigDecimal accountBalance;
-    private LocalDate accountCreateDate;
-    private LocalDate accountExpirationDate;
     private String customerName;
+    private String customerBirth;
     private String productName;
 
-    public AccountResponse(Account a) {
+    public AccountPendingResponse(Account a) {
         this.accountIndex = a.getAccountIndex();
         this.accountNum = a.getAccountNum();
-        this.accountBalance = a.getAccountBalance();
-        this.accountCreateDate = a.getAccountCreateDate();
-        this.accountExpirationDate = a.getAccountExpirationDate();
         this.customerName = a.getCustomer().getCustomerName();
-        this.customerName = a.getCustomer().getCustomerBirth();
+        this.customerBirth = a.getCustomer().getCustomerBirth();
         this.productName = a.getProduct() != null ? a.getProduct().getProductName() : null;
     }
 }

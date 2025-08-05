@@ -17,6 +17,10 @@ public class ProductService {
         return productsRepository.findAll();
     }
 
+    public Optional<Products> getProductByIdOptional(Long id) {
+        return productsRepository.findById(id);
+    }
+
     public Optional<List<Products>> getProductsByTypeOptional(String type) {
         List<Products> result = productsRepository.findByProductType(type);
         return result.isEmpty() ? Optional.empty() : Optional.of(result);

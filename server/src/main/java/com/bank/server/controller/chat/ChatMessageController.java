@@ -1,4 +1,4 @@
-package com.bank.server.controller;
+package com.bank.server.controller.chat;
 
 import com.bank.server.dto.chat.ChatMessageResponse;
 import com.bank.server.model.chat.ChatMessage;
