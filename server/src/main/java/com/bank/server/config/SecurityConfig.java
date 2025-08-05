@@ -5,7 +5,7 @@ import com.bank.server.security.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,29 +42,15 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers("/api/users/me").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/users").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
-
-                .requestMatchers("/api/chat").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/chat/**").hasAnyRole("USER", "ADMIN")
-
                 .requestMatchers("/api/friends").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/friends/**").hasAnyRole("USER", "ADMIN")
-
-                .requestMatchers(HttpMethod.GET,"/api/customers").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST,"/api/customers").hasRole("ADMIN")
+                .requestMatchers("/api/customers").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/customers/**").hasAnyRole("USER", "ADMIN")
-
-                .requestMatchers(HttpMethod.GET,"/api/products").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST,"/api/products").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/products").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
-
-                .requestMatchers(HttpMethod.GET,"/api/accounts").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST,"/api/accounts").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE,"/api/accounts").hasRole("ADMIN")
-                .requestMatchers("/api/accounts/customer/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/accounts/**/approve").hasRole("ADMIN")  
-                .requestMatchers("/api/accounts/**/reject").hasRole("ADMIN")
-                .requestMatchers("/api/accounts/**").hasRole("ADMIN")
-
+                .requestMatchers("/api/accounts").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/accounts/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/ws-chat/**").permitAll()
                 .anyRequest().authenticated()
             )

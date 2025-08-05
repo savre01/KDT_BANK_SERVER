@@ -13,7 +13,6 @@ public class AccountRequest {
     private String accountNum;
     private String accountPassword;
     private BigDecimal accountBalance;
-    private LocalDate accountCreateDate;
     //private LocalDate accountExpirationDate; 자동 계산
     private Integer paymentDay;
     //private String accountStatus; 기본값 pending(보류)

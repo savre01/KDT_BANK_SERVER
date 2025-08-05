@@ -61,17 +61,13 @@ public class AccountService {
         Products product = productsRepository.findById(request.getProductsIndex())
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
-        LocalDate createDate = request.getAccountCreateDate();
-        LocalDate expirationDate = createDate.plusMonths(product.getProductsDuration());
-
         Account account = new Account();
         account.setCustomer(customer);
         account.setProduct(product);
         account.setAccountNum(request.getAccountNum());
         account.setAccountPassword(request.getAccountPassword());
         account.setAccountBalance(request.getAccountBalance());
-        account.setAccountCreateDate(createDate);
-        account.setAccountExpirationDate(expirationDate);
+        account.setAccountExpirationDate(null);
         account.setPaymentDay(request.getPaymentDay());
 
         account.setAccountStatus(Account.AccountStatus.PENDING);
@@ -82,7 +78,15 @@ public class AccountService {
     @Transactional
     public void approveAccount(Long accountIndex) {
         Account account = getAccountById(accountIndex);
+        LocalDate now = LocalDate.now();
+
         account.setAccountStatus(Account.AccountStatus.ACTIVE);
+        account.setAccountCreateDate(now);
+
+        if (account.getProduct() != null) {
+            int duration = account.getProduct().getProductsDuration();
+            account.setAccountExpirationDate(now.plusMonths(duration));
+        }
     }
 
     @Transactional
