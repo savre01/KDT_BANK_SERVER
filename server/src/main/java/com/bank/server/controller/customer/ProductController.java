@@ -4,6 +4,9 @@ import com.bank.server.dto.customer.ProductRequest;
 import com.bank.server.dto.customer.ProductResponse;
 import com.bank.server.model.customer.Products;
 import com.bank.server.service.customer.ProductService;
+import com.bank.server.repository.customer.ProductsRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final ProductsRepository productsRepository;
 
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
@@ -54,5 +58,14 @@ public class ProductController {
         product.setProductName(request.getProductName());
         product.setProductsDuration(request.getDuration());
         return ResponseEntity.ok(new ProductResponse(productService.createProduct(product)));
+    }
+    @DeleteMapping("/{productIndex}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long productIndex) {
+        try {
+            productService.deleteProduct(productIndex);
+            return ResponseEntity.ok("상품이 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

@@ -54,7 +54,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers("/api/customers/**").hasAnyRole("USER", "ADMIN")
 
                 .requestMatchers(HttpMethod.GET,"/api/products").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST,"/api/products").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.POST,"/api/products").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,"/api/products").hasRole("ADMIN")
                 .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
 
                 .requestMatchers(HttpMethod.GET, "/api/accounts").hasAnyRole("USER", "ADMIN")         // 전체 조회
