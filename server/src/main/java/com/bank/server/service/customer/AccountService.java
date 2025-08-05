@@ -78,15 +78,21 @@ public class AccountService {
     @Transactional
     public void approveAccount(Long accountIndex) {
         Account account = getAccountById(accountIndex);
-        LocalDate now = LocalDate.now();
 
-        account.setAccountStatus(Account.AccountStatus.ACTIVE);
-        account.setAccountCreateDate(now);
+        // 생성일은 승인한 날짜로 설정
+        LocalDate createDate = LocalDate.now();
+        account.setAccountCreateDate(createDate);
 
-        if (account.getProduct() != null) {
-            int duration = account.getProduct().getProductsDuration();
-            account.setAccountExpirationDate(now.plusMonths(duration));
+        // 만료일 계산 (단, 기간 없는 상품은 null 유지)
+        Products product = account.getProduct();
+        if (product != null && product.getProductsDuration() != null) {
+            account.setAccountExpirationDate(createDate.plusMonths(product.getProductsDuration()));
+        } else {
+            account.setAccountExpirationDate(null); // 명시적으로 null
         }
+
+        // 계좌 상태를 ACTIVE로 변경
+        account.setAccountStatus(Account.AccountStatus.ACTIVE);
     }
 
     @Transactional
