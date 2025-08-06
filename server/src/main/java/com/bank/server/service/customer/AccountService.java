@@ -84,22 +84,29 @@ public class AccountService {
     @Transactional
     public void approveAccount(Long accountIndex) {
         Account account = getAccountById(accountIndex);
+        Account.AccountStatus previousStatus = account.getAccountStatus();
 
-        // 생성일은 승인한 날짜로 설정
-        LocalDate createDate = LocalDate.now();
-        account.setAccountCreateDate(createDate);
-
-        // 만료일 계산 (단, 기간 없는 상품은 null 유지)
-        Products product = account.getProduct();
-        if (product != null && product.getProductsDuration() != null) {
-            account.setAccountExpirationDate(createDate.plusMonths(product.getProductsDuration()));
-        } else {
-            account.setAccountExpirationDate(null); // 명시적으로 null
+        if (previousStatus == Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException("이미 활성화된 계좌입니다.");
         }
 
-        // 계좌 상태를 ACTIVE로 변경
+        // 🔹 생성 승인인 경우에만 생성일 및 만료일 설정
+        if (previousStatus == Account.AccountStatus.PENDING) {
+            LocalDate createDate = LocalDate.now();
+            account.setAccountCreateDate(createDate);
+
+            Products product = account.getProduct();
+            if (product != null && product.getProductsDuration() != null) {
+                account.setAccountExpirationDate(createDate.plusMonths(product.getProductsDuration()));
+            } else {
+                account.setAccountExpirationDate(null);
+            }
+        }
+
+        // 🔹 상태는 무조건 ACTIVE 로 변경 (PENDING 또는 DELETE_PENDING 모두)
         account.setAccountStatus(Account.AccountStatus.ACTIVE);
     }
+
 
     @Transactional
     public void rejectAndDeleteAccount(Long accountIndex) {
