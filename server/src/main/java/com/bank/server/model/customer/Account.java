@@ -6,6 +6,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Getter
 @Setter
@@ -19,10 +21,12 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customerIndex", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productsIndex")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Products product;
 
     @Column(nullable = false, unique = true)
@@ -41,12 +45,10 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status", nullable = false)
-    private AccountStatus accountStatus = AccountStatus.PENDING;
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
 
-    // 내부 enum으로 선언
     public enum AccountStatus {
-        PENDING,
-        ACTIVE,
-        DELETE_PENDING
+        ACTIVE,     // 실제 계좌만 존재
+        SUSPENDED   // (선택) 정지 상태 등 확장 가능
     }
 }

@@ -58,16 +58,18 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers(HttpMethod.DELETE,"/api/products").hasRole("ADMIN")
                 .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
 
+                // 계좌 관련
                 .requestMatchers(HttpMethod.GET, "/api/accounts").hasAnyRole("USER", "ADMIN")         // 전체 조회
-                .requestMatchers(HttpMethod.POST, "/api/accounts").hasAnyRole("USER", "ADMIN")        // 계좌 생성
-                .requestMatchers(HttpMethod.DELETE, "/api/accounts/**").hasRole("ADMIN")              // 단건 삭제
+                .requestMatchers(HttpMethod.POST, "/api/accounts").hasAnyRole("USER", "ADMIN")        // 계좌 직접 생성
+                .requestMatchers(HttpMethod.DELETE, "/api/accounts/**").hasRole("ADMIN")              // 직접 삭제
+                .requestMatchers("/api/accounts/customer/**").hasAnyRole("USER", "ADMIN")             // 고객별 계좌 조회
+                .requestMatchers(HttpMethod.GET, "/api/accounts/{id:\\d+}").hasRole("ADMIN")
 
-                .requestMatchers("/api/accounts/customer/**").hasAnyRole("USER", "ADMIN")             // 고객별 조회
-
-                .requestMatchers("/api/accounts/{id:\\d+}/approve").hasRole("ADMIN")                  // 승인
-                .requestMatchers("/api/accounts/{id:\\d+}/reject").hasRole("ADMIN")                   // 거절
-
-                .requestMatchers(HttpMethod.GET, "/api/accounts/{id:\\d+}").hasRole("ADMIN")  
+                // 계좌 요청 관련 (NEW)
+                .requestMatchers(HttpMethod.GET, "/api/account-request/pending").hasRole("ADMIN")     // 보류 요청 목록
+                .requestMatchers(HttpMethod.POST, "/api/account-request").hasAnyRole("USER", "ADMIN") // 요청 생성
+                .requestMatchers(HttpMethod.POST, "/api/account-request/{id:\\d+}/approve").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/account-request/{id:\\d+}/reject").hasRole("ADMIN")
 
                 .requestMatchers("/ws-chat/**").permitAll()
                 .anyRequest().authenticated()

@@ -7,7 +7,6 @@ import com.bank.server.model.customer.Products;
 import com.bank.server.repository.customer.AccountRepository;
 import com.bank.server.repository.customer.CustomerRepository;
 import com.bank.server.repository.customer.ProductsRepository;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,11 +48,10 @@ public class AccountService {
         return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
-    public List<Account> getPendingAccounts() {
-        return accountRepository.findByAccountStatusIn(
-                List.of(Account.AccountStatus.PENDING, Account.AccountStatus.DELETE_PENDING)
-        );
+    public List<Account> getAccountsByCustomer(Long customerIndex) {
+        return accountRepository.findByCustomer_CustomerIndex(customerIndex);
     }
+
 
     @Transactional
     public Account createAccountFromRequest(AccountRequest request) {
@@ -69,53 +67,20 @@ public class AccountService {
         account.setAccountNum(request.getAccountNum());
         account.setAccountPassword(request.getAccountPassword());
         account.setAccountBalance(request.getAccountBalance());
-        account.setAccountExpirationDate(null);
         account.setPaymentDay(request.getPaymentDay());
 
-        account.setAccountStatus(
-                request.getAccountStatus() != null
-                        ? request.getAccountStatus()
-                        : Account.AccountStatus.PENDING
-        );
+        LocalDate createDate = LocalDate.now();
+        account.setAccountCreateDate(createDate);
+
+        if (product.getProductsDuration() != null) {
+            account.setAccountExpirationDate(createDate.plusMonths(product.getProductsDuration()));
+        } else {
+            account.setAccountExpirationDate(null);
+        }
+
+        account.setAccountStatus(Account.AccountStatus.ACTIVE);  // 항상 ACTIVE 상태로 저장
 
         return accountRepository.save(account);
-    }
-
-    @Transactional
-    public void approveAccount(Long accountIndex) {
-        Account account = getAccountById(accountIndex);
-        Account.AccountStatus previousStatus = account.getAccountStatus();
-
-        if (previousStatus == Account.AccountStatus.ACTIVE) {
-            throw new IllegalStateException("이미 활성화된 계좌입니다.");
-        }
-
-        // 🔹 생성 승인인 경우에만 생성일 및 만료일 설정
-        if (previousStatus == Account.AccountStatus.PENDING) {
-            LocalDate createDate = LocalDate.now();
-            account.setAccountCreateDate(createDate);
-
-            Products product = account.getProduct();
-            if (product != null && product.getProductsDuration() != null) {
-                account.setAccountExpirationDate(createDate.plusMonths(product.getProductsDuration()));
-            } else {
-                account.setAccountExpirationDate(null);
-            }
-        }
-
-        // 🔹 상태는 무조건 ACTIVE 로 변경 (PENDING 또는 DELETE_PENDING 모두)
-        account.setAccountStatus(Account.AccountStatus.ACTIVE);
-    }
-
-
-    @Transactional
-    public void rejectAndDeleteAccount(Long accountIndex) {
-        Account account = getAccountById(accountIndex);
-        accountRepository.delete(account);
-    }
-    private Account getAccountById(Long id) {
-        return accountRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
     }
 
     @Transactional
@@ -124,4 +89,8 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
+    private Account getAccountById(Long id) {
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+    }
 }
