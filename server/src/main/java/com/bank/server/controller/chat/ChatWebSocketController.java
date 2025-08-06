@@ -4,10 +4,13 @@ import com.bank.server.dto.chat.ChatMessagePayload;
 import com.bank.server.dto.chat.ChatMessageResponse;
 import com.bank.server.model.User;
 import com.bank.server.model.chat.Chat;
+import com.bank.server.model.chat.ChatMember;
 import com.bank.server.model.chat.ChatMessage;
 import com.bank.server.repository.UserRepository;
+import com.bank.server.repository.chat.ChatMemberRepository;
 import com.bank.server.repository.chat.ChatMessageRepository;
 import com.bank.server.repository.chat.ChatRepository;
+import com.bank.server.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -15,6 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,7 +27,9 @@ public class ChatWebSocketController {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final ChatMessageRepository chatMessageRepository;
-    private final SimpMessagingTemplate messagingTemplate;  // ✅ 추가
+    private final ChatMemberRepository chatMemberRepository;
+    private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat.sendMessage")
     public void handleChatMessage(@Payload ChatMessagePayload payload) {
@@ -51,5 +57,14 @@ public class ChatWebSocketController {
         );
 
         messagingTemplate.convertAndSend("/topic/chat/" + payload.getChatIndex(), response);
+
+        // 💬 알림 전송
+        List<ChatMember> members = chatMemberRepository.findByChat(chat);
+        for (ChatMember member : members) {
+            Long memberId = member.getUser().getUserIndex();
+            if (!memberId.equals(user.getUserIndex())) {
+                notificationService.notifyChatMessage(chat.getChatIndex(), memberId);
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class AccountRequestResponse {
-    private Long id;
+    private Long requestIndex;
 
     private String customerName;
     private String customerBirth;
@@ -15,7 +15,7 @@ public class AccountRequestResponse {
 
 
     public AccountRequestResponse(AccountRequestEntity entity) {
-        this.id = entity.getRequestIndex();
+        this.requestIndex = entity.getRequestIndex();
         this.customerName = entity.getCustomer().getCustomerName();
         this.customerBirth = entity.getCustomer().getCustomerBirth();
         this.productName = entity.getProducts() != null ? entity.getProducts().getProductName() : null;

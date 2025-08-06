@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Chat + Notification Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+  <h2>✅ WebSocket 연결 상태: <span id="status">연결 안됨</span></h2>
+
+  <h3>📥 채팅 수신 (/topic/chat/1)</h3>
+  <ul id="chat-messages"></ul>
+
+  <h3>🔔 알림 수신 (/topic/notify)</h3>
+  <ul id="notifications"></ul>
+
+  <h3>✉️ 채팅 전송</h3>
+  <input type="text" id="chat-input" placeholder="메시지를 입력하세요">
+  <button onclick="sendChat()">전송</button>
+
+  <script>
+    let stompClient = null;
+
+    function connect() {
+      const socket = new SockJS("http://localhost:8080/ws-chat");
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect({}, function (frame) {
+        document.getElementById("status").innerText = "연결됨";
+
+        // 채팅방 구독
+        stompClient.subscribe("/topic/chat/1", function (message) {
+          const msg = JSON.parse(message.body);
+          const li = document.createElement("li");
+          li.textContent = `[${msg.sender}] ${msg.content}`;
+          document.getElementById("chat-messages").appendChild(li);
+        });
+
+        // 알림 구독
+        stompClient.subscribe("/topic/notify", function (message) {
+          const notify = JSON.parse(message.body);
+          const li = document.createElement("li");
+          li.textContent = `[${notify.type}] ${notify.message}`;
+          document.getElementById("notifications").appendChild(li);
+        });
+      });
+    }
+
+    function sendChat() {
+      const content = document.getElementById("chat-input").value;
+      stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({
+        chatIndex: 1,
+        userIndex: 3,
+        content: content
+      }));
+    }
+
+    connect();
+  </script>
+</body>
+</html>
