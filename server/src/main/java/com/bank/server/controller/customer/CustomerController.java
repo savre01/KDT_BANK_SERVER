@@ -43,5 +43,4 @@ public class CustomerController {
         customer.setCustomerBirth(request.getCustomerBirth());
         return ResponseEntity.ok(new CustomerResponse(customerService.createCustomer(customer)));
     }
-
 }

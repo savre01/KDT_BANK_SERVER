@@ -46,6 +46,7 @@ public class Account {
     // 내부 enum으로 선언
     public enum AccountStatus {
         PENDING,
-        ACTIVE
+        ACTIVE,
+        DELETE_PENDING
     }
 }

@@ -3,7 +3,9 @@ package com.bank.server.controller.customer;
 import com.bank.server.dto.customer.AccountRequest;
 import com.bank.server.dto.customer.AccountResponse;
 import com.bank.server.dto.customer.AccountPendingResponse;
+import com.bank.server.repository.customer.AccountRepository;
 import com.bank.server.model.customer.Account;
+import com.bank.server.model.customer.Account.AccountStatus;
 import com.bank.server.service.customer.AccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
     @GetMapping
     public ResponseEntity<List<AccountResponse>> getAllAccounts() {
@@ -32,6 +35,21 @@ public class AccountController {
     public ResponseEntity<AccountResponse> createAccount(@RequestBody AccountRequest request) {
         Account account = accountService.createAccountFromRequest(request);
         return ResponseEntity.ok(new AccountResponse(account));
+    }
+
+    @PutMapping("/{accountIndex}/delete-request")
+    public ResponseEntity<?> requestDelete(@PathVariable Long accountIndex) {
+        Account account = accountRepository.findById(accountIndex)
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        if (account.getAccountStatus() != AccountStatus.ACTIVE)  {
+            return ResponseEntity.badRequest().body("삭제 요청은 ACTIVE 계좌에만 가능합니다.");
+        }
+
+        account.setAccountStatus(AccountStatus.DELETE_PENDING);
+        accountRepository.save(account);
+
+        return ResponseEntity.ok("계좌 삭제 요청이 완료되었습니다.");
     }
 
     @GetMapping("/{accountIndex}")
@@ -63,6 +81,7 @@ public class AccountController {
             .toList();
         return ResponseEntity.ok(list);
     }
+
 
     @PutMapping("/{accountIndex}/approve")
     public ResponseEntity<String> approveAccount(@PathVariable Long accountIndex) {

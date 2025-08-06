@@ -23,7 +23,6 @@ public class AccountResponse {
         this.accountCreateDate = a.getAccountCreateDate();
         this.accountExpirationDate = a.getAccountExpirationDate();
         this.customerName = a.getCustomer().getCustomerName();
-        this.customerName = a.getCustomer().getCustomerBirth();
         this.productName = a.getProduct() != null ? a.getProduct().getProductName() : null;
     }
 }

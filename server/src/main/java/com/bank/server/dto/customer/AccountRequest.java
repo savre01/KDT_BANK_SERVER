@@ -1,4 +1,6 @@
 package com.bank.server.dto.customer;
+
+import com.bank.server.model.customer.Account;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -15,5 +17,5 @@ public class AccountRequest {
     private BigDecimal accountBalance;
     //private LocalDate accountExpirationDate; 자동 계산
     private Integer paymentDay;
-    //private String accountStatus; 기본값 pending(보류)
+    private Account.AccountStatus accountStatus; //기본값 pending(보류)
 }

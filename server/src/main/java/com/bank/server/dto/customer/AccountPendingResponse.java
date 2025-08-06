@@ -10,6 +10,7 @@ public class AccountPendingResponse {
     private String customerName;
     private String customerBirth;
     private String productName;
+    private String accountStatus;
 
     public AccountPendingResponse(Account a) {
         this.accountIndex = a.getAccountIndex();
@@ -17,5 +18,6 @@ public class AccountPendingResponse {
         this.customerName = a.getCustomer().getCustomerName();
         this.customerBirth = a.getCustomer().getCustomerBirth();
         this.productName = a.getProduct() != null ? a.getProduct().getProductName() : null;
+        this.accountStatus = a.getAccountStatus().name();
     }
 }

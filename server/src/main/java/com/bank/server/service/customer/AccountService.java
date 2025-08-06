@@ -50,7 +50,9 @@ public class AccountService {
     }
 
     public List<Account> getPendingAccounts() {
-        return accountRepository.findByAccountStatus(Account.AccountStatus.PENDING);
+        return accountRepository.findByAccountStatusIn(
+                List.of(Account.AccountStatus.PENDING, Account.AccountStatus.DELETE_PENDING)
+        );
     }
 
     @Transactional
@@ -70,7 +72,11 @@ public class AccountService {
         account.setAccountExpirationDate(null);
         account.setPaymentDay(request.getPaymentDay());
 
-        account.setAccountStatus(Account.AccountStatus.PENDING);
+        account.setAccountStatus(
+                request.getAccountStatus() != null
+                        ? request.getAccountStatus()
+                        : Account.AccountStatus.PENDING
+        );
 
         return accountRepository.save(account);
     }

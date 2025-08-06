@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByCustomer_CustomerIndex(Long customerIndex);
     Optional<Account> findByAccountNum(String accountNum);
-    List<Account> findByAccountStatus(Account.AccountStatus status);
+    List<Account> findByAccountStatusIn(List<Account.AccountStatus> statuses);
 }
