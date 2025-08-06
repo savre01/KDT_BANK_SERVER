@@ -1,6 +1,7 @@
 package com.bank.server.controller.chat;
 
 import com.bank.server.dto.chat.ChatMessagePayload;
+import com.bank.server.dto.chat.ChatMessageResponse;
 import com.bank.server.model.User;
 import com.bank.server.model.chat.Chat;
 import com.bank.server.model.chat.ChatMessage;
@@ -10,7 +11,7 @@ import com.bank.server.repository.chat.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.Date;
@@ -22,10 +23,10 @@ public class ChatWebSocketController {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final SimpMessagingTemplate messagingTemplate;  // ✅ 추가
 
     @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/chat/{chatIndex}")
-    public ChatMessage handleChatMessage(@Payload ChatMessagePayload payload) {
+    public void handleChatMessage(@Payload ChatMessagePayload payload) {
 
         Chat chat = chatRepository.findById(payload.getChatIndex())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다"));
@@ -39,6 +40,16 @@ public class ChatWebSocketController {
         message.setContent(payload.getContent());
         message.setSentTime(new Date());
 
-        return chatMessageRepository.save(message);
+        ChatMessage saved = chatMessageRepository.save(message);
+
+        ChatMessageResponse response = new ChatMessageResponse(
+                saved.getMessageIndex(),
+                saved.getContent(),
+                saved.getSentTime(),
+                user.getUserIndex(),
+                user.getUserName()
+        );
+
+        messagingTemplate.convertAndSend("/topic/chat/" + payload.getChatIndex(), response);
     }
 }
