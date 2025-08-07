@@ -19,15 +19,15 @@ public class AccountRequestEntity {
     private Long requestIndex;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customerIndex", nullable = false)
+    @JoinColumn(name = "customer_index", nullable = false)
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productsIndex")
+    @JoinColumn(name = "products_index")
     private Products products;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "accountIndex") // 삭제 요청일 경우 대상 계좌
+    @JoinColumn(name = "account_index") 
     private Account account;
 
     @Enumerated(EnumType.STRING)
@@ -43,6 +43,7 @@ public class AccountRequestEntity {
     private LocalDateTime processedAt;
 
     // 🔽 추가 필드들 (CREATE 요청에 필요)
+    @Column(name = "account_num")
     private String accountNum;
 
     private String accountPassword;

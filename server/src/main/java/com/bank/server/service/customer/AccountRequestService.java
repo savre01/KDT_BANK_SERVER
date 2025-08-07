@@ -7,11 +7,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +49,8 @@ public class AccountRequestService {
                 .accountBalance(dto.getAccountBalance())   
                 .paymentDay(dto.getPaymentDay())   
                 .build();
+                
+        System.out.println("넘어온 accountNum: " + dto.getAccountNum());
 
         return requestRepository.save(request);
     }

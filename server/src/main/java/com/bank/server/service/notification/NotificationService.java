@@ -34,6 +34,7 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         NotificationPayload payload = new NotificationPayload(
+                notification.getId(),
                 "NOTICE",
                 notification.getMessage(),
                 noticeId,
@@ -55,6 +56,7 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         NotificationPayload payload = new NotificationPayload(
+                notification.getId(),
                 "PRODUCT",
                 notification.getMessage(),
                 productId,
@@ -90,6 +92,7 @@ public class NotificationService {
                 notificationRepository.save(notification);
 
                 NotificationPayload payload = new NotificationPayload(
+                        notification.getId(),
                         "CHAT",
                         notification.getMessage(),
                         chatIndex,

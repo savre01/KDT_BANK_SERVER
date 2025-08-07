@@ -10,16 +10,22 @@ public class AccountRequestResponse {
     private String customerName;
     private String customerBirth;
     private String productName;
-    private String accountNum; // 삭제 요청일 경우에만
+    private String accountNum; 
     private AccountRequestEntity.RequestType requestType;
 
 
-    public AccountRequestResponse(AccountRequestEntity entity) {
+     public AccountRequestResponse(AccountRequestEntity entity) {
         this.requestIndex = entity.getRequestIndex();
         this.customerName = entity.getCustomer().getCustomerName();
         this.customerBirth = entity.getCustomer().getCustomerBirth();
         this.productName = entity.getProducts() != null ? entity.getProducts().getProductName() : null;
-        this.accountNum = entity.getAccount() != null ? entity.getAccount().getAccountNum() : null;
         this.requestType = entity.getType();
+
+        // 상황에 따라 다르게 처리
+        if (requestType == AccountRequestEntity.RequestType.DELETE) {
+            this.accountNum = entity.getAccount() != null ? entity.getAccount().getAccountNum() : null;
+        } else {
+            this.accountNum = entity.getAccountNum();
+        }
     }
 }
