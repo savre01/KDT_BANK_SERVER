@@ -16,10 +16,12 @@ public class NotificationWebSocketController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void sendNotification(NotificationPayload payload) {
-        messagingTemplate.convertAndSend("/topic/notify", payload);
+    // 사용자별 WebSocket 채널로 알림 전송
+    public void sendNotificationToUser(Long userId, NotificationPayload payload) {
+        messagingTemplate.convertAndSend("/topic/notify/" + userId, payload);
     }
 
+    // 테스트용 전역 broadcast (기존 유지)
     @PostMapping("/api/test/notify")
     public String testNotify(@RequestBody String message) {
         NotificationPayload payload = new NotificationPayload(
@@ -29,7 +31,7 @@ public class NotificationWebSocketController {
             null,                // referenceId
             LocalDateTime.now()  // createdAt
         );
-        sendNotification(payload);
+        messagingTemplate.convertAndSend("/topic/notify", payload); // 테스트는 broadcast 유지
         return "알림 전송 완료: " + message;
     }
 }

@@ -42,7 +42,7 @@ public class NotificationService {
                 noticeId,
                 now
         );
-        notificationWebSocketController.sendNotification(payload);
+        notificationWebSocketController.sendNotificationToUser(userId, payload);
     }
 
     public void notifyProductCreated(Long productId, Long userId) {
@@ -64,7 +64,7 @@ public class NotificationService {
                 productId,
                 now
         );
-        notificationWebSocketController.sendNotification(payload);
+        notificationWebSocketController.sendNotificationToUser(userId, payload);
     }
 
     public void markAsRead(Long id) {
@@ -79,15 +79,15 @@ public class NotificationService {
         chat.setChatIndex(chatIndex);
 
         List<ChatMember> members = chatMemberRepository.findByChat(chat);
-        System.out.println("💬 채팅방 #" + chatIndex + " 메시지 전송 시작 - 발신자: " + senderId);
-        System.out.println("📌 채팅방 참여자 수: " + members.size());
+        System.out.println("\uD83D\uDCAC 채팅방 #" + chatIndex + " 메시지 전송 시작 - 발신자: " + senderId);
+        System.out.println("\uD83D\uDCCC 채팅방 참여자 수: " + members.size());
 
         for (ChatMember member : members) {
             Long memberId = member.getUser().getUserIndex();
             boolean isSender = memberId.equals(senderId);
             boolean isInChat = chatService.isUserInChat(chatIndex, memberId);
 
-            System.out.println("👉 대상 사용자: " + memberId + " | 발신자 여부: " + isSender + " | 접속 중 여부: " + isInChat);
+            System.out.println("\uD83D\uDC49 대상 사용자: " + memberId + " | 발신자 여부: " + isSender + " | 접속 중 여부: " + isInChat);
 
             // 발신자 본인이 아니고, 현재 채팅방에 접속해 있지 않은 경우에만 알림 전송
             if (!isSender && !isInChat) {
@@ -109,8 +109,8 @@ public class NotificationService {
                         chatIndex,
                         now
                 );
-                System.out.println("🔔 알림 전송 대상 → 사용자: " + memberId);
-                notificationWebSocketController.sendNotification(payload);
+                System.out.println("\uD83D\uDD14 알림 전송 대상 → 사용자: " + memberId);
+                notificationWebSocketController.sendNotificationToUser(memberId, payload);
             }
         }
     }
