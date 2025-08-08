@@ -55,4 +55,11 @@ public class ChatMessageService {
                 ))
                 .collect(Collectors.toList());
     }
+    // 채팅방 내 메시지 전체 삭제
+    public void deleteAllMessagesInChat(Long chatIndex) {
+        Chat chat = new Chat();
+        chat.setChatIndex(chatIndex);
+        List<ChatMessage> messages = chatMessageRepository.findByChat(chat);
+        chatMessageRepository.deleteAll(messages);
+    }
 }

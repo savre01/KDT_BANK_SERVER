@@ -37,4 +37,10 @@ public class ChatMessageController {
     public ResponseEntity<List<ChatMessageResponse>> getMessages(@PathVariable Long chatIndex) {
         return ResponseEntity.ok(chatMessageService.getMessageResponsesByChat(chatIndex));
     }
+    // 채팅방 내 모든 메시지 삭제
+    @DeleteMapping("/{chatIndex}")
+    public ResponseEntity<String> deleteAllMessagesInChat(@PathVariable Long chatIndex) {
+        chatMessageService.deleteAllMessagesInChat(chatIndex);
+        return ResponseEntity.ok("채팅방 #" + chatIndex + "의 모든 메시지를 삭제했습니다.");
+    }
 }

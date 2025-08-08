@@ -13,14 +13,13 @@ import com.bank.server.repository.UserRepository;
 import com.bank.server.repository.FriendRepository;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +29,29 @@ public class ChatService {
     private final ChatMemberRepository chatMemberRepository;
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
+
+
+    // ✅ 채팅방 접속 사용자 관리
+    private final Map<Long, Set<Long>> activeChatUsers = new ConcurrentHashMap<>();
+
+    public void enterChat(Long chatIndex, Long userIndex) {
+        activeChatUsers.computeIfAbsent(chatIndex, k -> ConcurrentHashMap.newKeySet()).add(userIndex);
+    }
+
+    public void leaveChat(Long chatIndex, Long userIndex) {
+        Set<Long> users = activeChatUsers.get(chatIndex);
+        if (users != null) {
+            users.remove(userIndex);
+            if (users.isEmpty()) {
+                activeChatUsers.remove(chatIndex);
+            }
+        }
+    }
+
+    public boolean isUserInChat(Long chatIndex, Long userIndex) {
+        Set<Long> users = activeChatUsers.get(chatIndex);
+        return users != null && users.contains(userIndex);
+    }
 
     // 채팅방 생성
     public Chat createChat(String name, Long requesterIndex, List<Long> memberIndexes) {

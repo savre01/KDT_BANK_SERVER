@@ -9,6 +9,7 @@ import com.bank.server.repository.notification.NotificationRepository;
 import com.bank.server.repository.chat.ChatMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.bank.server.service.chat.ChatService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationWebSocketController notificationWebSocketController;
     private final ChatMemberRepository chatMemberRepository;
+    private final ChatService chatService;
 
     public void notifyNoticeCreated(Long noticeId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
@@ -79,7 +81,9 @@ public class NotificationService {
         List<ChatMember> members = chatMemberRepository.findByChat(chat);
         for (ChatMember member : members) {
             Long memberId = member.getUser().getUserIndex();
-            if (!memberId.equals(senderId)) {
+
+            // 발신자 본인이 아니고, 현재 채팅방에 접속해 있지 않은 경우에만 알림 전송
+            if (!memberId.equals(senderId) && !chatService.isUserInChat(chatIndex, memberId)) {
                 LocalDateTime now = LocalDateTime.now();
 
                 Notification notification = new Notification();

@@ -49,7 +49,7 @@ public class NotificationController {
         return counts;
     }
 
-    // 특정 유형의 알림을 모두 읽음 처리
+    // 알림을 모두 읽음 처리
     @PostMapping("/mark-read")
     public ResponseEntity<String> markAllAsReadAndDelete(Authentication authentication) {
         String userId = authentication.getName();

@@ -56,4 +56,23 @@ public class ChatController {
         String userId = principal.getName();
         return ResponseEntity.ok(chatService.getChatsByUser(userId));
     }
+
+    @PostMapping("/{chatIndex}/enter")
+    public ResponseEntity<String> enterChat(@PathVariable Long chatIndex, Authentication authentication) {
+        String userId = authentication.getName();
+        Long userIndex = userService.getUserByUserId(userId).getUserIndex();
+
+        chatService.enterChat(chatIndex, userIndex);  // 접속 상태 등록
+        return ResponseEntity.ok("채팅방 입장 처리 완료");
+    }
+
+    // 채팅방 퇴장
+    @PostMapping("/{chatIndex}/leave")
+    public ResponseEntity<String> leaveChat(@PathVariable Long chatIndex, Authentication authentication) {
+        String userId = authentication.getName();
+        Long userIndex = userService.getUserByUserId(userId).getUserIndex();
+
+        chatService.leaveChat(chatIndex, userIndex);  // 접속 상태 제거
+        return ResponseEntity.ok("채팅방 퇴장 처리 완료");
+    }
 }
