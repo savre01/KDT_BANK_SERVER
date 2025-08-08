@@ -72,9 +72,9 @@ public class ChatMemberService {
             .map(member -> {
                 User user = member.getUser();
                 return new ChatMemberResponse(
-                        user.getUserIndex(),
-                        user.getUserId(),
-                        user.getUserName()
+                        user.getUserName(),
+                        user.getDepartment(),
+                        user.getPosition()
                 );
             })
             .collect(Collectors.toList());

@@ -128,9 +128,9 @@ public class ChatService {
                             .map(member -> {
                                 User user = member.getUser();
                                 return new ChatMemberResponse(
-                                        user.getUserIndex(),
-                                        user.getUserId(),
-                                        user.getUserName()
+                                        user.getUserName(),
+                                        user.getDepartment(),
+                                        user.getPosition()
                                 );
                             })
                             .collect(Collectors.toList());
@@ -150,9 +150,9 @@ public class ChatService {
                 .map(chat -> {
                 List<ChatMemberResponse> members = chatMemberRepository.findByChat(chat).stream()
                         .map(member -> new ChatMemberResponse(
-                                member.getUser().getUserIndex(),
-                                member.getUser().getUserId(),
-                                member.getUser().getUserName()
+                                member.getUser().getUserName(),
+                                member.getUser().getDepartment(),
+                                member.getUser().getPosition()
                         ))
                         .collect(Collectors.toList());
 
