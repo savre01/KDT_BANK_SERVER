@@ -79,11 +79,18 @@ public class NotificationService {
         chat.setChatIndex(chatIndex);
 
         List<ChatMember> members = chatMemberRepository.findByChat(chat);
+        System.out.println("💬 채팅방 #" + chatIndex + " 메시지 전송 시작 - 발신자: " + senderId);
+        System.out.println("📌 채팅방 참여자 수: " + members.size());
+
         for (ChatMember member : members) {
             Long memberId = member.getUser().getUserIndex();
+            boolean isSender = memberId.equals(senderId);
+            boolean isInChat = chatService.isUserInChat(chatIndex, memberId);
+
+            System.out.println("👉 대상 사용자: " + memberId + " | 발신자 여부: " + isSender + " | 접속 중 여부: " + isInChat);
 
             // 발신자 본인이 아니고, 현재 채팅방에 접속해 있지 않은 경우에만 알림 전송
-            if (!memberId.equals(senderId) && !chatService.isUserInChat(chatIndex, memberId)) {
+            if (!isSender && !isInChat) {
                 LocalDateTime now = LocalDateTime.now();
 
                 Notification notification = new Notification();
@@ -102,6 +109,7 @@ public class NotificationService {
                         chatIndex,
                         now
                 );
+                System.out.println("🔔 알림 전송 대상 → 사용자: " + memberId);
                 notificationWebSocketController.sendNotification(payload);
             }
         }
