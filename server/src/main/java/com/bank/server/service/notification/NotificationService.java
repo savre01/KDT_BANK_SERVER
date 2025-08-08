@@ -42,7 +42,10 @@ public class NotificationService {
                 noticeId,
                 now
         );
-        notificationWebSocketController.sendNotificationToUser(userId, payload);
+        boolean isSender = true;
+        if (!isSender) {
+            notificationWebSocketController.sendNotificationToUser(userId, payload);
+        }
     }
 
     public void notifyProductCreated(Long productId, Long userId) {
@@ -64,7 +67,10 @@ public class NotificationService {
                 productId,
                 now
         );
-        notificationWebSocketController.sendNotificationToUser(userId, payload);
+        boolean isSender = true;
+        if (!isSender) {
+            notificationWebSocketController.sendNotificationToUser(userId, payload);
+        }
     }
 
     public void markAsRead(Long id) {
