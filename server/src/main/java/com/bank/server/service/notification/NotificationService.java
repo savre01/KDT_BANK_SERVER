@@ -3,9 +3,11 @@ package com.bank.server.service.notification;
 import com.bank.server.controller.notification.NotificationWebSocketController;
 import com.bank.server.dto.notification.NotificationPayload;
 import com.bank.server.model.notification.Notification;
+import com.bank.server.model.User;
 import com.bank.server.model.chat.Chat;
 import com.bank.server.model.chat.ChatMember;
 import com.bank.server.repository.notification.NotificationRepository;
+import com.bank.server.repository.UserRepository;
 import com.bank.server.repository.chat.ChatMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,54 +24,61 @@ public class NotificationService {
     private final NotificationWebSocketController notificationWebSocketController;
     private final ChatMemberRepository chatMemberRepository;
     private final ChatService chatService;
+    private final UserRepository userRepository;
 
-    public void notifyNoticeCreated(Long noticeId, Long userId) {
+    public void notifyNoticeCreated(Long noticeId, Long senderId) {
         LocalDateTime now = LocalDateTime.now();
+        List<User> allUsers = userRepository.findAll();
 
-        Notification notification = new Notification();
-        notification.setUserId(userId);
-        notification.setType("NOTICE");
-        notification.setMessage("새 공지사항이 등록되었습니다.");
-        notification.setReferenceId(noticeId);
-        notification.setCreatedAt(now);
-        notification.setRead(false);
-        notificationRepository.save(notification);
+        for (User user : allUsers) {
+            Long memberId = user.getUserIndex();
+            if (memberId.equals(senderId)) continue; // 작성자 제외
 
-        NotificationPayload payload = new NotificationPayload(
-                notification.getId(),
-                "NOTICE",
-                notification.getMessage(),
-                noticeId,
-                now
-        );
-        boolean isSender = true;
-        if (!isSender) {
-            notificationWebSocketController.sendNotificationToUser(userId, payload);
+            Notification notification = new Notification();
+            notification.setUserId(memberId);
+            notification.setType("NOTICE");
+            notification.setMessage("새 공지사항이 등록되었습니다.");
+            notification.setReferenceId(noticeId);
+            notification.setCreatedAt(now);
+            notification.setRead(false);
+            notificationRepository.save(notification);
+
+            NotificationPayload payload = new NotificationPayload(
+                    notification.getId(),
+                    "NOTICE",
+                    notification.getMessage(),
+                    noticeId,
+                    now
+            );
+            notificationWebSocketController.sendNotificationToUser(memberId, payload);
         }
     }
 
-    public void notifyProductCreated(Long productId, Long userId) {
+    public void notifyProductCreated(Long productId, Long senderId) {
         LocalDateTime now = LocalDateTime.now();
+        List<User> allUsers = userRepository.findAll();
 
-        Notification notification = new Notification();
-        notification.setUserId(userId);
-        notification.setType("PRODUCT");
-        notification.setMessage("새 상품이 추가되었습니다.");
-        notification.setReferenceId(productId);
-        notification.setCreatedAt(now);
-        notification.setRead(false);
-        notificationRepository.save(notification);
+        for (User user : allUsers) {
+            Long memberId = user.getUserIndex();
+            if (memberId.equals(senderId)) continue; // 작성자 제외
 
-        NotificationPayload payload = new NotificationPayload(
-                notification.getId(),
-                "PRODUCT",
-                notification.getMessage(),
-                productId,
-                now
-        );
-        boolean isSender = true;
-        if (!isSender) {
-            notificationWebSocketController.sendNotificationToUser(userId, payload);
+            Notification notification = new Notification();
+            notification.setUserId(memberId);
+            notification.setType("PRODUCT");
+            notification.setMessage("새 상품이 추가되었습니다.");
+            notification.setReferenceId(productId);
+            notification.setCreatedAt(now);
+            notification.setRead(false);
+            notificationRepository.save(notification);
+
+            NotificationPayload payload = new NotificationPayload(
+                    notification.getId(),
+                    "PRODUCT",
+                    notification.getMessage(),
+                    productId,
+                    now
+            );
+            notificationWebSocketController.sendNotificationToUser(memberId, payload);
         }
     }
 
